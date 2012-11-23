@@ -1,3 +1,6 @@
 virtualenv.mk
 *.pyc
 .coverage
+build
+dist
+MANIFEST

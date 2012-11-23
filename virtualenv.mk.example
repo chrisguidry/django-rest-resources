@@ -1,2 +1,2 @@
 PYTHON=/usr/bin/python2.7
-DJANGO_RESOURCES_VE=~/.environments/django-resources/
+DJANGO_REST_RESOURCES_VE=~/.environments/django-rest-resources/
