@@ -117,13 +117,13 @@ class Resource(object):
         content_type = request.META["CONTENT_TYPE"]
         if content_type.startswith("application/json"):
             try:
-                return json.loads(request.raw_post_data)
+                return json.loads(request.body)
             except:
                 raise HttpException(422, "The provided JSON body could not be parsed.")
         elif content_type.startswith("multipart/form-data"):
             return dict(request.POST.items())
         elif content_type.startswith("text/plain"):
-            return { "value": request.raw_post_data }
+            return { "value": request.body }
         elif content_type.startswith('application/x-www-form-urlencoded'):
             return dict(request.POST)
         else:
