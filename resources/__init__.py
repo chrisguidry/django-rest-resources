@@ -30,7 +30,7 @@ class HttpException(Exception):
 
     def as_http_response(self):
         response = HttpResponse(status=self.status_code,
-                                mimetype="text/plain",
+                                content_type="text/plain",
                                 content=self.response)
 
         for header, value in self.headers.items():
@@ -68,7 +68,7 @@ class Resource(object):
             return method(request, *args, **kwargs)
         except HttpException as e:
             if "application/json+html" in get_acceptable_types(request):
-                return HttpResponse(status=httplib.OK, mimetype="text/html",
+                return HttpResponse(status=httplib.OK, content_type="text/html",
                                     content=json.dumps({ "success": False, "message": e.response }))
             return e.as_http_response()
 
@@ -117,13 +117,13 @@ class Resource(object):
         content_type = request.META["CONTENT_TYPE"]
         if content_type.startswith("application/json"):
             try:
-                return json.loads(request.raw_post_data)
+                return json.loads(request.body)
             except:
                 raise HttpException(422, "The provided JSON body could not be parsed.")
         elif content_type.startswith("multipart/form-data"):
             return dict(request.POST.items())
         elif content_type.startswith("text/plain"):
-            return { "value": request.raw_post_data }
+            return { "value": request.body }
         elif content_type.startswith('application/x-www-form-urlencoded'):
             return dict(request.POST)
         else:
@@ -173,7 +173,7 @@ class Resource(object):
                                      (" or %s." % ", ".join(also_valid) if also_valid else "."))
 
     def empty(self, request, status):
-        return HttpResponse("", status=status, mimetype="text/plain")
+        return HttpResponse("", status=status, content_type="text/plain")
 
     def render(self, request, context, status):
         acceptable_types = get_acceptable_types(request)
@@ -214,7 +214,7 @@ class Resource(object):
             if "__charset__" in context and context["__charset__"]:
                 mediatype += "; charset=" + context["__charset__"]
 
-            response = HttpResponse(content, status=status, mimetype=output_type)
+            response = HttpResponse(content, status=status, content_type=output_type)
 
             response["Content-Language"] = (context["language"] +
                                             ("-" + context["dialect"] if "dialect" in context else ""))
